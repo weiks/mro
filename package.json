@@ -21,5 +21,8 @@
   "main": "d3.parsets.js",
   "devDependencies": {
     "uglify-js": "1.2.x"
+  },
+  "dependencies": {
+    "iopipe": "0.0.20"
   }
 }

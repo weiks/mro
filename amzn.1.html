@@ -91,7 +91,7 @@ pre, code { font-family: "Menlo", monospace; }
 <script src="https://www.jasondavies.com/parallel-sets/highlight.min.js"></script>
 <script>
 var chart = d3.parsets()
-    .dimensions([ "GC","ag",  "sep", "jul","ag_jul"]);
+    .dimensions([ "ag",  "sep", "jul","ag_jul"]);
 
 var vis = d3.select("#vis").append("svg")
     .attr("width", chart.width())
@@ -114,7 +114,7 @@ function curves() {
   t.call(chart.tension(this.checked ? .5 : 1));
 }
 
-d3.csv("mro.csv?201402", function(error, csv) {
+d3.csv("mro2.csv?201402", function(error, csv) {
   vis.datum(csv).call(chart);
 
   window.icicle = function() {
