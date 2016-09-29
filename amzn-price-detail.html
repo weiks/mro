@@ -271,3 +271,33 @@ d3.select("#file").on("change", function() {
 });
 </script>
 
+<h2>Data explanation</h2>
+<table>
+  <tr>
+    <th>Dimension</th><th>Label</th><th>Recommended Sort</th><th>Description</th>
+  </tr>
+  <tr>
+    <td>Amazon seller</td></td><td>Jul, Sep</td><td><< Alpha</td><td>Where you search for a SKU, is it:<ol><li>Unavailable</li>
+    <li>Marketplace</li><li>FBA = Fulfilled by Amazon</li><li>SSA = Sold by and shipped from Amazon</li></ol> </td>
+  </tr>
+  <tr><td>Available on Grainger</td><td>Grainger</td><td><< Alpha</td><td><ol><li>0. Unavailable</li><li>1. Available</li></ol></td></tr>
+<tr><td>Private label</td><td>GC</td><td>Alpha >></td><td>GC - Grainger Choice/private label; Other - branded</td></tr>
+<tr><td>Price differential</td><td>ag_july, ag_sep</td><td><< alpha</td><td><ol><li>Neither</li><li>Grainger only</li><li>Grainger better</li><li>Same</li><li>Amazon better</li><li>Amazon only</li></ol></td></tr>
+<tr><td>Category</td><td>Grainger category</td><td><< size</td><td>Metalworking, etc.</td></tr>
+<tr><td>In stock</td><td>is_sep, is_jul</td><td><< alpha</td><td>None, Zoro only Grainger only, Z+G+A, Amazon only</td></tr>
+</table>
+<br/>
+<h2>navigation</h2>
+  <li><a href="index.html">index</a>Market structure, Grainger availability and private label</li>
+  <li><a href="amzn-detail.html">amzn-detail</a>Pricing and market structure, from July to Sep </li>
+  <li><a href="amzn-price-detail.html">amzn-price-detail</a></li>
+
+  <li><a href="amzn-price.html">amzn-price</a>A look at how prices on Amazon have changed, by Grainger category</li>
+  <li><a href="amzn.1.html">amzn.1</a> Shows how prices changed from July to September, with details about the structure of the Amazon marketplace</li>
+  <li><a href="amzn.html">amzn</a>A deep dive into private label and relative pricing</li>
+  <li><a href="category.html">category</a></li>
+  <li><a href="grainger.html">grainger</a>How prices on Zoro and Grainger compare in September, by category</li>
+  <li><a href="instock.html">instock</a>How in stock availability changed on Amazon and Grainger, from Jul to Sept</li>
+  <li><a href="instock-detail.html">instock-detail</a>A confusing look at instock availability, relative price and marketplace structure</li>
+
+</ul>
