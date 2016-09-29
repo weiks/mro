@@ -72,7 +72,7 @@ pre, code { font-family: "Menlo", monospace; }
 
 <body>
 <h1>MRO</h1>
-<p class="meta">Visualizing SKU overlap over time.
+<p class="meta">A look at how prices on Amazon have changed, by Grainger category
 
 <h2></h2>
 <div id="vis"><noscript><img src="parsets.png"></noscript></div>
@@ -300,3 +300,21 @@ d3.select("#file").on("change", function() {
   <li><a href="instock-detail.html">instock-detail</a>A confusing look at instock availability, relative price and marketplace structure</li>
 
 </ul>
+
+<style>
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+
+tr:nth-child(even) {
+    background-color: #dddddd;
+}
+</style>

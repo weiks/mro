@@ -72,18 +72,13 @@ pre, code { font-family: "Menlo", monospace; }
 
 <body>
 <h1>MRO</h1>
-<p class="meta">Visualizing SKU overlap over time.
+<p class="meta">Shows how prices changed from July to September, with details about the structure of the Amazon marketplace
 
 <h2></h2>
 <div id="vis"><noscript><img src="parsets.png"></noscript></div>
 <div class="options">
   <span class="curves"><label for="curved"><input type="checkbox" id="curved" onchange="curves.call(this)"> Curves?</label></span>
 </div>
-
-<h2>Explanation</h2>
-<p>For each dimension (Survived, Sex, Age and Class), a horizontal bar is shown for each of its possible categories.  The width of the bar denotes the absolute number of matches for that category.
-<p>Starting with the first dimension (Survived), each of its categories is connected to a number of categories in the next dimension, showing how that category is subdivided. This subdividing is repeated recursively, producing a tree of “ribbons”.
-<p>Drag the dimensions and categories to reorder them. You can also click the “alpha” or “size” links that appear next to the dimension name on mouseover, to order the categories by name or frequency.
 
 
 <script src="https://www.jasondavies.com/d3.min.js"></script>
@@ -301,3 +296,21 @@ d3.select("#file").on("change", function() {
   <li><a href="instock-detail.html">instock-detail</a>A confusing look at instock availability, relative price and marketplace structure</li>
 
 </ul>
+
+<style>
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+
+tr:nth-child(even) {
+    background-color: #dddddd;
+}
+</style>

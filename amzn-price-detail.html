@@ -72,7 +72,7 @@ pre, code { font-family: "Menlo", monospace; }
 
 <body>
 <h1>MRO</h1>
-<p class="meta">Visualizing SKU overlap over time.
+<p class="meta">Pricing changes by category, July to Sep
 
 <h2></h2>
 <div id="vis"><noscript><img src="parsets.png"></noscript></div>
@@ -290,7 +290,7 @@ d3.select("#file").on("change", function() {
 <h2>navigation</h2>
   <li><a href="index.html">index</a>Market structure, Grainger availability and private label</li>
   <li><a href="amzn-detail.html">amzn-detail</a>Pricing and market structure, from July to Sep </li>
-  <li><a href="amzn-price-detail.html">amzn-price-detail</a></li>
+  <li><a href="amzn-price-detail.html">amzn-price-detail</a> Pricing changes by category, July to Sep</li>
 
   <li><a href="amzn-price.html">amzn-price</a>A look at how prices on Amazon have changed, by Grainger category</li>
   <li><a href="amzn.1.html">amzn.1</a> Shows how prices changed from July to September, with details about the structure of the Amazon marketplace</li>
@@ -301,3 +301,21 @@ d3.select("#file").on("change", function() {
   <li><a href="instock-detail.html">instock-detail</a>A confusing look at instock availability, relative price and marketplace structure</li>
 
 </ul>
+
+<style>
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+
+tr:nth-child(even) {
+    background-color: #dddddd;
+}
+</style>
