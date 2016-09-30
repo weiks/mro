@@ -222,7 +222,7 @@ document.getElementById("filters-container").innerHTML = filters.map(function (c
              + "</tr>"
     }).join("");
     
-    document.getElementById("back-link").setAttribute("href", "/index.html?" + filters.map(function (c, index) {
+    document.getElementById("back-link").setAttribute("href", "index.html?" + filters.map(function (c, index) {
       return "d" + (index + 1) + "=" + encodeURIComponent(c[0]);
     }).join("&"));
 </script>
