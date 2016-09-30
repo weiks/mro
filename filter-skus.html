@@ -1,0 +1,246 @@
+
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Parallel Sets</title>
+<style>
+body {
+  font-family: sans-serif;
+  font-size: 16px;
+  width: 960px;
+  margin: 1em auto;
+  position: relative;
+}
+h1, h2, .dimension text {
+  text-align: center;
+  font-family: "PT Sans", Helvetica;
+  font-weight: 300;
+}
+h1 {
+  font-size: 4em;
+  margin: .5em 0 0 0;
+}
+h2 {
+  font-size: 2em;
+  margin: 1em 0 0.5em;
+  border-bottom: solid #ccc 1px;
+}
+p.meta, p.footer {
+  font-size: 13px;
+  color: #333;
+}
+p.meta {
+  text-align: center;
+}
+
+text.icicle { pointer-events: none; }
+
+.options { font-size: 12px; text-align: center; padding: 5px 0; }
+.curves { float: left; }
+.source { float: right; }
+pre, code { font-family: "Menlo", monospace; }
+
+.html .value,
+.javascript .string,
+.javascript .regexp {
+  color: #756bb1;
+}
+
+.html .tag,
+.css .tag,
+.javascript .keyword {
+  color: #3182bd;
+}
+
+.comment {
+  color: #636363;
+}
+
+.html .doctype,
+.javascript .number {
+  color: #31a354;
+}
+
+.html .attribute,
+.css .attribute,
+.javascript .class,
+.javascript .special {
+  color: #e6550d;
+}
+</style>
+<body>
+<h1>MRO</h1>
+<script src="https://www.jasondavies.com/d3.min.js"></script>
+<script src="https://www.jasondavies.com/parallel-sets/d3.parsets.js"></script>
+<script src="https://www.jasondavies.com/parallel-sets/highlight.min.js"></script>
+<script src="sorttable.js"></script>
+
+<script>
+
+
+function parseQuery(search) {
+    search = search || location.search;
+    var args = search.substring(1).split('&');
+
+    var argsParsed = {};
+
+    var i, arg, kvp, key, value;
+
+    for (i=0; i < args.length; i++) {
+
+        arg = args[i];
+
+        if (-1 === arg.indexOf('=')) {
+
+            argsParsed[decodeURIComponent(arg).trim()] = true;
+        }
+        else {
+
+            kvp = arg.split('=');
+
+            key = decodeURIComponent(kvp[0]).trim();
+
+            value = decodeURIComponent(kvp[1]).trim();
+
+            argsParsed[key] = value;
+        }
+    }
+
+    return argsParsed;
+}
+
+var parsedQuery = parseQuery();
+
+var filters = [];
+function getArr (key) {
+    var re = key === "cat" ? /^cat[0-9]+$/ : /^val[0-9]+$/;
+    return Object.keys(parsedQuery).filter(function (cKey) {
+      return re.test(cKey);
+    }).map(function (c) {
+      return {
+        key: c,
+        order: parseInt(c.slice(1))
+      }
+    }).sort(function (a, b) {
+      return a.order < b.order ? -1 : 1
+    }).map(function (c) {
+      return parsedQuery[c.key];
+    });
+}
+
+var categories = getArr("cat");
+var values = getArr("val");
+
+categories.forEach(function (c, i) {
+   filters.push([c, values[i]]);
+});
+
+d3.csv("mro.csv", function(error, csv) {
+    var filtered = csv.filter(function (c) {
+        for (var i = 0; i < filters.length; i++) {
+            var cFilter = filters[i];
+            if (c[cFilter[0]] !== cFilter[1]) {
+                return false;
+            }
+        }
+        return true;
+    });
+    
+    // Create the rows
+    document.getElementById("sku-container").innerHTML = filtered.map(function (c) {
+        return "<tr>"
+              + "<td>" + c.sku + "</td>"
+              + "<td>" + c.grainger_cat + "</td>"
+              + "<td> "  + (+c.gprice-c.aprice).toFixed(2) + "</td>"
+              + "<td><a href='" + c.amzn + "'> $" + c.aprice + "</a></td>"
+              + "<td><a href='" + c.grainger + "'> $" + c.gprice + "</a></td>"
+              + "<td><a href='" + c.zoro + "'> $" + c.zprice + "</a></td>"
+
+             + "</tr>"
+    }).join("");
+
+    console.log(filtered);
+});
+</script>
+
+<style>
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+
+tr:nth-child(even) {
+    background-color: #dddddd;
+}
+</style>
+
+<h2>Items</h2>
+<a href="/index.html" id="back-link">« Back</a>
+
+<h2>Filters</h2>
+
+<table>
+  <thead>
+     <tr>
+        <th>Dimension</th><th>Value</th>
+     </tr>
+  </thead>
+  <tbody id="filters-container">
+    
+  </tbody>
+</table>
+
+<h2>SKUs</h2>
+
+<table class="sortable">
+  <thead>
+     <tr>
+        <th>SKU</th>
+         <th>Category</th>
+         <th class="sorttable_numeric">gww-amzn</th>
+         <th class="sorttable_numeric">Amazon</th>
+         <th class="sorttable_numeric">Grainger</th>
+        <th class="sorttable_numeric">Zoro</th>
+     </tr>
+  </thead>
+  <tbody id="sku-container">
+      
+  </tbody>
+</table>
+
+<script>
+document.getElementById("filters-container").innerHTML = filters.map(function (c) {
+        return "<tr>"
+              + "<td>" + c[0] + "</td>"
+              + "<td>" + c[1] + "</td>"
+             + "</tr>"
+    }).join("");
+    
+    document.getElementById("back-link").setAttribute("href", "/index.html?" + filters.map(function (c, index) {
+      return "d" + (index + 1) + "=" + encodeURIComponent(c[0]);
+    }).join("&"));
+</script>
+
+<style>
+table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+}
+
+td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+}
+
+tr:nth-child(even) {
+    background-color: #dddddd;
+}
+</style>

@@ -86,7 +86,7 @@ pre, code { font-family: "Menlo", monospace; }
 <script src="https://www.jasondavies.com/parallel-sets/highlight.min.js"></script>
 <script>
 var chart = d3.parsets()
-    .dimensions(["grainger_cat", "is_sep", "sep"]);
+    .dimensions(["jul", "sep"]);
 
 var vis = d3.select("#vis").append("svg")
     .attr("width", chart.width())
@@ -111,7 +111,38 @@ function curves() {
 
 d3.csv("mro.csv?201402", function(error, csv) {
   vis.datum(csv).call(chart);
-
+  
+  function clickSVG (elm) {
+    var evt = new MouseEvent("click");
+    elm.dispatchEvent(evt);
+  }
+  
+  // Default sort should Alphabetical
+  Array.prototype.slice.call(document.querySelectorAll(".sort.alpha")).filter(function (c) {
+     return c.innerHTML === "alpha »"
+  }).forEach(clickSVG);
+  
+  //Array.prototype.slice.call(document.querySelectorAll("g.dimension")).forEach(function (cGroup) {
+  //   var dimensionLabel = cGroup.querySelector(".name").innerHTML;
+  //   var selector = ".sort.alpha";
+  //   var direction = 1; // 1 or -1
+  //   if (dimensionLabel === "jul") {
+  //      //selector = ".sort.size";
+  //      direction = 1;
+  //   }
+  //   var sortEl = cGroup.querySelector(selector);
+  //   var sortText = sortEl.innerHTML;
+  //   
+  //   clickSVG(sortEl);
+  //   clickSVG(sortEl);
+  //   
+  //   if ((sortText.charAt(0) === "«" && direction === -1)
+  //    || (sortText.slice(-1) === "»" && direction === 1)) {
+  //       clickSVG(sortEl);
+  //   }
+  //});
+  
+    
   window.icicle = function() {
     var newIce = this.checked,
         tension = chart.tension();

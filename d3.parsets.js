@@ -2,6 +2,7 @@
 // Functionality based on http://eagereyes.org/parallel-sets
 (function() {
   d3.parsets = function() {
+    debugger
     var event = d3.dispatch("sortDimensions", "sortCategories"),
         dimensions_ = autoDimensions,
         dimensionFormat = String,
@@ -563,6 +564,7 @@
       return a < b ? -1 : a > b ? 1 : a >= b ? 0 : a <= a ? -1 : b <= b ? 1 : NaN;
     }
   };
+  
   d3.parsets.tree = buildTree;
 
   function autoDimensions(d) {

@@ -95,14 +95,78 @@ td, th {
 tr:nth-child(even) {
     background-color: #dddddd;
 }
+
+#all-dimensions li {
+  cursor: pointer;
+}
 </style>
 
 <script src="https://www.jasondavies.com/d3.min.js"></script>
 <script src="https://www.jasondavies.com/parallel-sets/d3.parsets.js"></script>
 <script src="https://www.jasondavies.com/parallel-sets/highlight.min.js"></script>
+
+<div class="dimensions-section">
+  <h2>Add new dimension</h2>
+  <ul id="all-dimensions"></ul>
+</div>
+
 <script>
+
+function parseQuery(search) {
+    search = search || location.search;
+    var args = search.substring(1).split('&');
+
+    var argsParsed = {};
+
+    var i, arg, kvp, key, value;
+
+    for (i=0; i < args.length; i++) {
+
+        arg = args[i];
+
+        if (-1 === arg.indexOf('=')) {
+
+            argsParsed[decodeURIComponent(arg).trim()] = true;
+        }
+        else {
+
+            kvp = arg.split('=');
+
+            key = decodeURIComponent(kvp[0]).trim();
+
+            value = decodeURIComponent(kvp[1]).trim();
+
+            argsParsed[key] = value;
+        }
+    }
+
+    return argsParsed;
+}
+
+var parsedQuery = parseQuery();
+var chartDimensions = Object.keys(parsedQuery).filter(function (cKey) {
+  return /^d[0-9]+$/.test(cKey);
+}).map(function (c) {
+  return {
+    key: c,
+    order: parseInt(c.slice(1))
+  }
+}).sort(function (a, b) {
+  return a.order < b.order ? -1 : 1
+}).map(function (c) {
+  return parsedQuery[c.key];
+});
+
+// [ "sep", "grainger", "GC", "jul"]
+
+// on("click", function () {
+//   // take the dimension
+//   //dimensions.push(newDimension)
+//   renderGraph();
+// })
+
 var chart = d3.parsets()
-    .dimensions([ "sep", "grainger", "GC"]);
+    .dimensions(chartDimensions);
 
 var vis = d3.select("#vis").append("svg")
     .attr("width", chart.width())
@@ -125,8 +189,113 @@ function curves() {
   t.call(chart.tension(this.checked ? .5 : 1));
 }
 
-d3.csv("mro.csv?201402", function(error, csv) {
+// Database call
+// make an ajax call to /get-items
+// fetch("/get-items").then(function (items) {
+//   ...
+// })
+
+d3.csv("mro2.csv", function(error, csv) {
+  var $allDimensions = document.querySelector("#all-dimensions");
+  
+  function encodeDimensions () {
+    location.search = chartDimensions.map(function (c, index) {
+      return "d" + (index + 1) + "=" + encodeURIComponent(c);
+    }).join("&");
+    // (chartDimensions.length ? "&" : "") + ("d" + (chartDimensions.length + 1) + "=" +);
+  }
+  
+  Object.keys(csv[0]).forEach(function (c) {
+    if (c === "sku" || ~chartDimensions.indexOf(c)) { return; }
+    var $li = document.createElement("li");
+    $li.textContent = c;
+    $li.addEventListener("click", function () {
+      chartDimensions.push(c);
+      encodeDimensions();
+    });
+    $allDimensions.appendChild($li);
+  });
+  
+  if (chartDimensions.length < 2) {
+    document.getElementById("vis").style.display = "none";
+    return alert("Please add " + (2 - chartDimensions.length) + " more dimension" + (chartDimensions.length === 1 ? "" : "s") + ".");
+  }
+  
   vis.datum(csv).call(chart);
+  
+  
+  function clickSVG (elm) {
+    var evt = new MouseEvent("click");
+    elm.dispatchEvent(evt);
+  }
+  
+  
+  // Default sort should Alphabetical
+  Array.prototype.slice.call(document.querySelectorAll(".sort.alpha")).filter(function (c) {
+     return c.innerHTML === "alpha »"
+  }).forEach(clickSVG);
+  
+  var $dimensions = Array.prototype.slice.call(document.querySelectorAll("g.dimension"));
+  
+  
+  d3.selectAll("g.dimension > text.dimension")
+      .append("tspan")
+      .attr("class", "sort remove")
+      .attr("dx", "2em")
+      .html("remove &times;")
+      .on("click", function () {
+          if (chartDimensions.length === 2) {
+            return alert("You must have at least 2 dimensions.");
+          }
+          var index = $dimensions.indexOf(this.parentNode.parentNode);
+          chartDimensions.splice(index, 1);
+          encodeDimensions();
+      });
+  
+    var $tooltipElm = null;
+    setInterval(function () {
+      var $tooltip = document.querySelector(".parsets.tooltip");
+      if ($tooltip.style.display === "none") { return $tooltipElm = null; }
+      $tooltipElm = $tooltip;
+    }, 200);
+  
+    d3.select("svg").on("click", function (e) {
+    //document.querySelector("svg").addEventListener("click", function (e) {
+     
+      var $tooltip = $tooltipElm;
+      if (!$tooltip) { return; }
+      var categories = Array.prototype.slice.call(document.querySelectorAll("g.dimension .name")).map(function (c) {
+          return c.innerHTML;
+      });
+      var splits = $tooltip.innerHTML.split("<br>")
+      var values = splits[0].split("→").map(function (c, index) {
+        return {
+          val: c.trim(),
+          cat: categories[index]
+        };
+      }); // [{val: <value>, cat: <category> }, ...]
+      
+      var qs = values.map(function (cObj, index) {
+        var i = index + 1;
+        return "cat" + i + "=" + encodeURIComponent(cObj.cat)
+             + "&val" + i + "=" + encodeURIComponent(cObj.val); 
+      }).join("&");
+      
+    //   cat=sep&val=2%20Marketplace
+    // &cat=jul&val=1 Unavaiable
+    
+      // QueryString extended
+      // cat: ["sep", "jul"],
+      // val: ["2 Marketplace", "1 Unavailable"]
+    
+      //   cat1=sep&val1=2 Marketplace
+      // &cat2=jul&val2=1 Unavaiable
+      
+      var url = "/filter-skus.html?" + qs;
+      console.log(url);
+      window.location = url;
+    });
+    
 
   window.icicle = function() {
     var newIce = this.checked,
@@ -298,17 +467,3 @@ d3.select("#file").on("change", function() {
 <tr><td>In stock</td><td>is_sep, is_jul</td><td><< alpha</td><td>None, Zoro only Grainger only, Z+G+A, Amazon only</td></tr>
 </table>
 <br/>
-<h2>navigation</h2>
-  <li><a href="index.html">index</a>Market structure, Grainger availability and private label</li>
-  <li><a href="amzn-detail.html">amzn-detail</a>Pricing and market structure, from July to Sep </li>
-  <li><a href="amzn-price-detail.html">amzn-price-detail</a></li>
-
-  <li><a href="amzn-price.html">amzn-price</a>A look at how prices on Amazon have changed, by Grainger category</li>
-  <li><a href="amzn.1.html">amzn.1</a> Shows how prices changed from July to September, with details about the structure of the Amazon marketplace</li>
-  <li><a href="amzn.html">amzn</a>A deep dive into private label and relative pricing</li>
-  <li><a href="category.html">category</a></li>
-  <li><a href="grainger.html">grainger</a>How prices on Zoro and Grainger compare in September, by category</li>
-  <li><a href="instock.html">instock</a>How in stock availability changed on Amazon and Grainger, from Jul to Sept</li>
-  <li><a href="instock-detail.html">instock-detail</a>A confusing look at instock availability, relative price and marketplace structure</li>
-
-</ul>
